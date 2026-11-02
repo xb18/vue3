@@ -8,6 +8,7 @@ import {
   type TemplateChildNode,
   type TemplateNode,
   createSimpleExpression,
+  isStaticArgOf,
 } from '@vue/compiler-dom'
 import { extend } from '@vue/shared'
 import {
@@ -80,9 +81,7 @@ export function wrapTemplate(node: ElementNode, dirs: string[]): TemplateNode {
       prop.type === NodeTypes.DIRECTIVE &&
       (dirs.includes(prop.name) ||
         (prop.name === 'bind' &&
-          prop.arg &&
-          prop.arg.type === NodeTypes.SIMPLE_EXPRESSION &&
-          prop.arg.content === 'key' &&
+          isStaticArgOf(prop.arg, 'key') &&
           dirs.includes('key')))
     ) {
       reserved.push(prop)

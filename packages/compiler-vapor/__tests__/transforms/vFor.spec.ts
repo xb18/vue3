@@ -833,4 +833,14 @@ describe('compiler: v-for', () => {
       'JSON.stringify({ a: _getDefaultValue(_for_item0.value.a, () => (3)), b: _for_item0.value[_ctx.k] })',
     )
   })
+
+  test('a dynamic argument named key is not the key', () => {
+    const { code } = compileWithVFor(
+      `<div v-for="(v, key) in attrs" :[key]="v" :key="key" />`,
+    )
+    expect(code).toContain('(v, key) => (key)')
+    expect(code).toContain(
+      '_setDynamicProps(n2, [{ [_for_key0.value || ""]: _for_item0.value }])',
+    )
+  })
 })

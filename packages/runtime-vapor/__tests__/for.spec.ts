@@ -1463,6 +1463,26 @@ describe('createFor', () => {
     expect(vapor.text).toBe(vdom.text)
   })
 
+  test('a dynamic argument named key binds like vdom', async () => {
+    const rows: string[] = []
+    await renderParity(
+      {
+        App: `<template><i v-for="(value, key) in data.attrs" :key="key" :[key]="value" /></template>`,
+      },
+      () => ref({ attrs: { title: 'a', id: 'b' } as Record<string, string> }),
+      async (data, root) => {
+        data.value.attrs.title = 'c'
+        await nextTick()
+        rows.push([...root.querySelectorAll('i')].map(i => i.outerHTML).join())
+      },
+    )
+    // vdom, then vapor
+    expect(rows).toEqual([
+      '<i title="c"></i>,<i id="b"></i>',
+      '<i title="c"></i>,<i id="b"></i>',
+    ])
+  })
+
   describe('readonly source', () => {
     test('should not allow mutation', () => {
       const arr = readonly(reactive([{ foo: 1 }]))

@@ -5,6 +5,7 @@ import {
   transformElement,
   transformKey,
   transformText,
+  transformVBind,
   transformVFor,
   transformVIf,
   transformVOnce,
@@ -23,6 +24,9 @@ const compileWithKey = makeCompile({
     transformVSlot,
     transformChildren,
   ],
+  directiveTransforms: {
+    bind: transformVBind,
+  },
 })
 
 describe('compiler: key', () => {
@@ -147,6 +151,14 @@ describe('compiler: key', () => {
       const { code } = compileWithKey(`<div v-for="i in list" :key="i"></div>`)
       expect(code).toMatchSnapshot()
       expect(code).not.contains('_createKeyedFragment(')
+    })
+
+    test('dynamic argument named key + key', () => {
+      const { code } = compileWithKey(`<div :[key]="v" :key="id" />`)
+      expect(code).contains('_createKeyedFragment(() => (_ctx.id)')
+      expect(code).contains(
+        '_setDynamicProps(n1, [{ [_ctx.key || ""]: _ctx.v }])',
+      )
     })
   })
 
